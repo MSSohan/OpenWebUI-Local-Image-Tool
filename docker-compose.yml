@@ -1,0 +1,63 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.4
+    ports:
+      - "127.0.0.1:3000:8080"
+    environment:
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:?Set WEBUI_SECRET_KEY in .env}
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on:
+      image-tool:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  image-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      # Only expose generated images and local API to this computer.
+      - "127.0.0.1:8001:8000"
+    environment:
+      IMAGE_TOOL_API_TOKEN: ${IMAGE_TOOL_API_TOKEN:?Set IMAGE_TOOL_API_TOKEN in .env}
+      COMFYUI_URL: ${COMFYUI_URL:-http://host.docker.internal:8188}
+      COMFYUI_CHECKPOINT: ${COMFYUI_CHECKPOINT:-sd_turbo.safetensors}
+      COMFYUI_TIMEOUT_SECONDS: ${COMFYUI_TIMEOUT_SECONDS:-900}
+      PUBLIC_IMAGE_BASE_URL: ${PUBLIC_IMAGE_BASE_URL:-http://localhost:8001}
+      OUTPUT_DIR: /app/generated
+    volumes:
+      - ./generated:/app/generated
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - app-net
+
+networks:
+  app-net:
+
+volumes:
+  open-webui-data:
+  ollama-data:
