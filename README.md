@@ -43,14 +43,19 @@ Keep this terminal open.
 
 ### 2. Configure Environment Variables
 
-From the project root:
+From the project root, create your local environment file:
 
 ```powershell
 Copy-Item .env.example .env
+```
+
+Generate two different secrets by running this command twice:
+
+```powershell
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-Generate two different secrets and configure `.env`:
+Copy the first generated value to `WEBUI_SECRET_KEY` and the second to `IMAGE_TOOL_API_TOKEN` in `.env`:
 
 ```dotenv
 WEBUI_SECRET_KEY=<your-random-secret>
@@ -89,6 +94,22 @@ Example prompt:
 > A photorealistic modern desk with a black printer, a smartphone displaying a document ready to print, soft natural daylight, clean professional workspace, realistic photography
 
 The tool returns the generated image URL and a Markdown image link.
+
+
+## Generated Outputs
+
+Images generated using the local image-generation tool:
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="generated/4f0c5b17-d835-4977-a431-a48b3b7710b0.png" alt="Generated image sample 1" width="320" />
+    </td>
+    <td width="50%">
+      <img src="generated/6b50fd4c-fa4b-4fc4-aa2d-82c0d722aacc.png" alt="Generated image sample 2" width="320" />
+    </td>
+  </tr>
+</table>
 
 ## Testing
 
