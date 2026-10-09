@@ -86,7 +86,7 @@ Enable the tool in a chat with a model that supports tool calling.
 
 Example prompt:
 
-> Generate an image of a red cabin in a snowy pine forest at sunrise.
+> A photorealistic modern desk with a black printer, a smartphone displaying a document ready to print, soft natural daylight, clean professional workspace, realistic photography
 
 The tool returns the generated image URL and a Markdown image link.
 
